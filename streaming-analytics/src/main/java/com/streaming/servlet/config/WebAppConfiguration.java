@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
-import javax.servlet.FilterChain;
+import javax.servlet.Servlet;
 
 public class WebAppConfiguration {
 
@@ -62,6 +62,16 @@ public class WebAppConfiguration {
 		return false;
 	}
 
+	public WebAppConfiguration newServletConfiguration(Class<? extends Servlet> servletClass, Class<? extends Filter>[] filterClasses, String... urlPatterns) {
+		new ServletConfiguration(servletClass, this, urlPatterns);
+		if (filterClasses != null) {
+			for (Class<? extends Filter> filterClass : filterClasses) {
+				addFilterConfigurations( new FilterConfiguration(filterClass, urlPatterns));
+			}
+		}
+		return this;
+	}
+
 	public WebAppConfiguration addServletConfigurations(
 			ServletConfiguration... configs) {
 
@@ -104,7 +114,7 @@ public class WebAppConfiguration {
 	}
 
 
-	public FilterChain initFilterChain(String uri) {
+	public ServletFilterChain initFilterChain(String uri) {
 		List<FilterConfiguration> filterCfgList = new ArrayList<>();
 		ServletConfiguration servletCfg = findServlet(uri);
 

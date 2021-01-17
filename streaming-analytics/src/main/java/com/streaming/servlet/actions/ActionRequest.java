@@ -50,7 +50,9 @@ public class ActionRequest<T> extends GenericServletRequest
 
 			@Override
 			public int read() throws IOException {
-				return strReader.read();
+
+				int val = strReader.read();
+				return val;
 			}
 		};
 

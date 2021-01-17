@@ -6,6 +6,10 @@ package com.streaming;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.streaming.servlet.ServletWebApp;
+import com.streaming.servlet.TestHttpServlet;
+import com.streaming.servlet.config.WebAppConfiguration;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -42,6 +46,12 @@ public final class NettyServer {
 			sslCtx = null;
 		}
 
+		WebAppConfiguration webAppCfg = new WebAppConfiguration("/servlet");
+		webAppCfg.newServletConfiguration(TestHttpServlet.class, null, "/test");
+
+		ServletWebApp webApp = new ServletWebApp();
+		webApp.init(webAppCfg);
+
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try {
@@ -53,12 +63,14 @@ public final class NettyServer {
 
 				@Override
 				protected void initChannel(SocketChannel ch) throws Exception {
+					System.out.println("init channel");
+					Thread.dumpStack();
 					ChannelPipeline p = ch.pipeline();
 					if (sslCtx != null) {
 						p.addLast( sslCtx.newHandler(ch.alloc()));
 					}
 
-					p.addLast( new MultiProtocolServerHandler(sslCtx));
+					p.addLast( new MultiProtocolServerHandler(sslCtx, webApp));
 				}
 
 			});
@@ -69,6 +81,7 @@ public final class NettyServer {
 		} finally {
 			workerGroup.shutdownGracefully();
 			bossGroup.shutdownGracefully();
+			webApp.destroy();
 		}
 	}
 }

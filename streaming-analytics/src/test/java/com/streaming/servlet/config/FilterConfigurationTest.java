@@ -12,7 +12,7 @@ public class FilterConfigurationTest {
 		FilterConfiguration type = new FilterConfiguration("Set Character Encoding", (Filter)null, "/*", "/test/*");
 		type.setDescription("Set Characeter Encoding Servlet");
 
-		ServletConfiguration stype = new ServletConfiguration("Set CE", (Servlet)null);
+		ServletConfiguration stype = new ServletConfiguration("Set CE", (Servlet)null, null);
 		stype.setEnabled(false);
 	}
 }

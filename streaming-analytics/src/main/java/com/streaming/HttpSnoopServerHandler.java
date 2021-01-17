@@ -30,6 +30,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.streaming.servlet.ServletWebApp;
+import com.streaming.utils.ThreadLocals;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -53,23 +56,31 @@ public class HttpSnoopServerHandler extends SimpleChannelInboundHandler<Object> 
 
     private HttpRequest request;
     /** Buffer that stores the response content */
-    private final StringBuilder buf = new StringBuilder();
+    private final StringBuilder buf = ThreadLocals.stringBuilder.get();
+    private final ServletWebApp webApp;
 
-    @Override
+
+    public HttpSnoopServerHandler(ServletWebApp webApp) {
+		super();
+		this.webApp = webApp;
+	}
+
+	@Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
-        if (msg instanceof HttpRequest) {
+
+    	if (msg instanceof HttpRequest) {
             HttpRequest request = this.request = (HttpRequest) msg;
 
             if (HttpHeaders.is100ContinueExpected(request)) {
                 send100Continue(ctx);
             }
 
-            buf.setLength(0);
+
             buf.append("WELCOME TO THE WILD WILD WEB SERVER\r\n");
             buf.append("===================================\r\n");
 

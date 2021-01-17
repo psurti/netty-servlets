@@ -2,6 +2,8 @@ package com.streaming.servlet.config;
 
 public class Configuration {
 
+	protected Configuration() {}
+
 	protected static final <T> T newInstance(Class<T> clazz)  {
         try {
             return clazz.newInstance();

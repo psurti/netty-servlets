@@ -9,6 +9,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+/**
+ * Implementation of the Servlet FilterChain Specification
+ *
+ * @author psurti
+ */
 public class ServletFilterChain implements FilterChain {
 
 	private final ServletConfiguration servletCfg;
@@ -28,9 +33,13 @@ public class ServletFilterChain implements FilterChain {
 		if (config != null) {
 			config.getComponent().doFilter(req, resp, this);
 		}
-
-		if (this.servletCfg != null) {
+		else if (this.servletCfg != null) {
 			servletCfg.getComponent().service(req, resp);
 		}
+	}
+
+	public boolean isValid() {
+		return this.servletCfg != null
+				|| (this.filterCfgs != null && !this.filterCfgs.isEmpty());
 	}
 }

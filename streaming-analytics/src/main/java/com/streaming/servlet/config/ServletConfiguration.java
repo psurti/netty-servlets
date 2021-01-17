@@ -13,35 +13,35 @@ implements ServletConfig {
 	private boolean enabled;
 
 
-	public ServletConfiguration(String name, Servlet servlet) {
-		this(name, servlet, DEFAULT_URL_PATTERN);
+	public ServletConfiguration(String name, Servlet servlet, WebAppConfiguration parent) {
+		this(name, servlet, parent, DEFAULT_URL_PATTERN);
 	}
 
-	public ServletConfiguration(Servlet servlet) {
-		this(null, servlet, DEFAULT_URL_PATTERN);
+	public ServletConfiguration(Servlet servlet, WebAppConfiguration parent) {
+		this(null, servlet, parent, DEFAULT_URL_PATTERN);
 	}
 
-	public ServletConfiguration(Servlet servlet, String... urlPatterns ) {
-		this(null, servlet, urlPatterns);
+	public ServletConfiguration(Servlet servlet, WebAppConfiguration parent, String... urlPatterns ) {
+		this(null, servlet, parent, urlPatterns);
 	}
 
-	public ServletConfiguration(Class<? extends Servlet> servletClass) {
-		this(null, servletClass, DEFAULT_URL_PATTERN);
+	public ServletConfiguration(Class<? extends Servlet> servletClass, WebAppConfiguration parent) {
+		this(null, servletClass, parent, DEFAULT_URL_PATTERN);
 	}
 
-	public ServletConfiguration(String name, Class<? extends Servlet> servletClass) {
-		this(name, servletClass, DEFAULT_URL_PATTERN);
+	public ServletConfiguration(String name, Class<? extends Servlet> servletClass, WebAppConfiguration parent) {
+		this(name, servletClass, parent, DEFAULT_URL_PATTERN);
 	}
 
-	public ServletConfiguration(Class<? extends Servlet> servletClass, String... urlPatterns) {
-		this(null, newInstance(servletClass), urlPatterns);
+	public ServletConfiguration(Class<? extends Servlet> servletClass, WebAppConfiguration parent, String... urlPatterns) {
+		this(null, newInstance(servletClass), parent, urlPatterns);
 	}
 
-	public ServletConfiguration(String name, Class<? extends Servlet> servletClass, String... urlPatterns) {
-		this(name, newInstance(servletClass), urlPatterns);
+	public ServletConfiguration(String name, Class<? extends Servlet> servletClass, WebAppConfiguration parent, String... urlPatterns) {
+		this(name, newInstance(servletClass), parent,  urlPatterns);
 	}
 
-	public ServletConfiguration(String name, Servlet servlet, String... urlPatterns) {
+	public ServletConfiguration(String name, Servlet servlet, WebAppConfiguration parent, String... urlPatterns) {
 		super(name, servlet);
 
 		if (urlPatterns == null) {
@@ -52,9 +52,13 @@ implements ServletConfig {
 		enabled = true;
 
 		for (String urlPattern : urlPatterns ) {
-			ServletMappingConfiguration type = new ServletMappingConfiguration(urlPattern);
+			urlPattern = (!urlPattern.endsWith("/")) ? urlPattern + "/" : urlPattern;
+			ServletMappingConfiguration type = new ServletMappingConfiguration(parent.getContextPath() + urlPattern);
 			addMappingConfigurations(type);
 		}
+
+		if (parent != null)
+			parent.addServletConfigurations(this);
 	}
 
 	/**

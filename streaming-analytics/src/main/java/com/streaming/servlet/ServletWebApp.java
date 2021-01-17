@@ -1,10 +1,16 @@
 package com.streaming.servlet;
 
-import javax.servlet.FilterChain;
+import java.io.IOException;
+import java.io.PrintWriter;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import com.streaming.servlet.config.ServletFilterChain;
 import com.streaming.servlet.config.WebAppConfiguration;
 
-public class ServletWebApp {
+public class ServletWebApp  {
 
 	private WebAppConfiguration config;
 
@@ -29,10 +35,30 @@ public class ServletWebApp {
 	}
 
 
-	public void run(String uri) {
-		FilterChain chain = this.config.initFilterChain(uri);
-		if (chain != null ) {
-			//handleServletRequest(request, chain)
+	public boolean run(String uri, ServletRequest req, ServletResponse resp)
+			throws IOException, ServletException {
+
+		boolean ret = true;
+
+		ServletFilterChain chain = this.config.initFilterChain(uri);
+
+		if (chain.isValid() ) {
+			handleServletRequest(req, resp, chain);
+		} else {
+			throw new IllegalArgumentException( "No handler for uri:" + uri);
 		}
+
+		return ret;
 	}
+
+	private void handleServletRequest(ServletRequest req, ServletResponse resp, ServletFilterChain chain)
+			throws IOException, ServletException {
+
+		chain.doFilter(req, resp);
+
+		PrintWriter writer = resp.getWriter();
+		if (writer != null)
+			writer.flush();
+	}
+
 }

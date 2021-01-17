@@ -250,7 +250,7 @@ public class GenericServletRequest implements ServletRequest {
 	 */
 	@Override
 	public boolean isSecure() {
-		// TODO Auto-generated method stub
+		// TODO
 		return false;
 	}
 

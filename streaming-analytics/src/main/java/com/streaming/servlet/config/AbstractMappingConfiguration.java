@@ -41,6 +41,7 @@ public  class AbstractMappingConfiguration {
 	 */
 	public String getMatchingUrlPattern(String path) {
 
+		System.out.println( path + " matches " + regexPattern + " " + regexPattern.matcher(path).matches());
 		if (this.regexPattern.matcher(path).matches())
 			return sanitizedUrlPattern;
 

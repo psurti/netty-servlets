@@ -43,11 +43,13 @@ public abstract class ActionServlet<T, K> extends GenericServlet implements Acti
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void service(ActionRequest<T> req, ActionResponse<K> resp) throws ServletException, IOException {
-
 		//-- pending: convert body to object
-		String data = mapper.readValue(req.getInputStream(), String.class);
-		logger.info( "data: {0}", data);
+
+		T data = (T) mapper.readValue(req.getInputStream(), req.getInput().getClass());
+		logger.info( "data.class:" + data.getClass());
+		logger.info( "data: '{}'", data);
 		//-- pending: convert object to body
 
 		K result = execute(req.getInput());
